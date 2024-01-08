@@ -1,0 +1,23 @@
+iptables -F
+
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+
+#Rule 1
+iptables -A FORWARD -s 192.168.60.0/24 -d 10.9.0.0/24 -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -s 10.9.0.0/24 -d 192.168.60.0/24 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+#Rule 2
+iptables -A INPUT -i eth0 -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i eth1 -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+
+#Rule 3
+iptables -A FORWARD -s 192.168.60.5 -d 10.9.0.5 -p tcp --dport 23 -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -s 10.9.0.5 -d 192.168.60.5 -p tcp --sport 23 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+iptables -L -v
+
+
